@@ -18,6 +18,9 @@ import BillCollectionSite from "./pages/billcollectionsite"
 import SmsPage from "./pages/SmsPage"
 import Chalan from "./pages/Chalan"
 import ChalanPrint from "./pages/ChalanPrint"
+import AreaPage from "./pages/AreaPage"
+import ObhijogPage from "./pages/ObhijogPage"
+
 
 export default function DashboardPage({ onLogout }) {
   const [activePage, setActivePage] = useState("dashboard")
@@ -32,51 +35,69 @@ export default function DashboardPage({ onLogout }) {
     return () => mq.removeEventListener?.("change", apply)
   }, [])
 
-  const renderContent = () => {
-    switch (activePage) {
-      case "dashboard":
-        return <DashboardContent onPageChange={setActivePage} />
-      case "employees":
-        return <EmployeeList />
-      case "customers":
-        return <CustomerList />
-      case "vendors":
-        return <VendorList />
-      case "products":
-        return <ProductServices />
-      case "meter":
-        return <MeterReading />
+const renderContent = () => {
+  switch (activePage) {
+    case "dashboard":
+      return <DashboardContent onPageChange={setActivePage} />
 
-      // ✅ Sales submenu
-      case "chalan":
-        return <Chalan />
-      case "chalanPrint":
-        return <ChalanPrint />
+    case "employees":
+      return <EmployeeList />
 
-      case "sales":
-        return <Sales />
-      case "invoices":
-        return <InvoiceList />
-      case "billing":
-        return <BillingSheet />
+    case "customers":
+      return <CustomerList />
 
-      // ✅ Site submenu
-      case "meterReadingSite":
-        return <MeterReadingSite />
-      case "billCollectionSite":
-        return <BillCollectionSite />
+    case "vendors":
+      return <VendorList />
 
-      // ✅ SMS
-      case "sms":
-        return <SmsPage />
+    // ✅ NEW
+    case "area":
+      return <AreaPage />
 
-      case "settings":
-        return <Settings />
+    // ✅ NEW
+    case "obhijog":
+      return <ObhijogPage />
 
-      default:
-        return <DashboardContent onPageChange={setActivePage} />
-    }
+    case "products":
+      return <ProductServices />
+
+    case "meter":
+      return <MeterReading />
+
+    // ✅ Sales submenu
+    case "chalan":
+      return <Sales />
+
+    case "chalanPrint":
+      return <ChalanPrint />
+
+    case "sales":
+      return <Sales />
+
+    case "invoices":
+      return <InvoiceList />
+
+    case "billing":
+      return <BillingSheet />
+
+    // ✅ Site submenu
+    case "meterReadingSite":
+      return <MeterReadingSite />
+
+    case "billCollectionSite":
+      return <BillCollectionSite />
+
+    // ✅ SMS
+    case "sms":
+      return <SmsPage />
+
+    case "settings":
+      return <Settings />
+
+    default:
+      return <DashboardContent onPageChange={setActivePage} />
   }
+}
+
 
   return (
     <div className="flex h-screen bg-gray-50">

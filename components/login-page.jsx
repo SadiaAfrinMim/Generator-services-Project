@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState } from "react"
 import { Eye, EyeOff, LogIn } from "lucide-react"
@@ -23,14 +23,14 @@ export default function LoginPage({ onLogin }) {
             <div className="mb-12">
               <div className="inline-flex items-center gap-3 mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white text-xl font-bold">T</span>
+                  <span className="text-white text-xl font-bold">SG</span>
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent">
-                    Tech-dea
-                  </h1>
-                  <p className="text-sm text-gray-600">Business Management System</p>
-                </div>
+               <div>
+  <h1 className="text-3xl font-bold bg-gradient-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent">
+    শাহিদ জেনারেটর সার্ভিস
+  </h1>
+  
+</div>
               </div>
 
               <div className="mb-8">

@@ -11,8 +11,9 @@ import {
   Gauge,
   TrendingUp,
   Folder,
-  Circle,
-  MessageSquare
+  MessageSquare,
+  MapPin,
+  AlertCircle,
 } from "lucide-react"
 
 export default function Sidebar({ activePage, onPageChange, isOpen, onOpenChange }) {
@@ -44,24 +45,28 @@ export default function Sidebar({ activePage, onPageChange, isOpen, onOpenChange
   const profileRole = "Owner"
   const profileImg = "https://api.dicebear.com/7.x/avataaars/svg?seed=shahid-hossain"
 
-const menuItems = [
-  { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
-  { id: "employees", label: "কর্মচারী", icon: Users },
-  { id: "customers", label: "গ্রাহক", icon: ShoppingCart },
-  { id: "vendors", label: "বিক্রেতা", icon: Truck },
-  { id: "products", label: "পণ্য ও সেবা", icon: Package },
-  { id: "meter", label: "মিটার রিডিং", icon: Gauge },
-  { id: "sms", label: "এসএমএস", icon: MessageSquare },
-]
+  const menuItems = [
+    { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
+    { id: "employees", label: "কর্মচারী", icon: Users },
+    { id: "customers", label: "গ্রাহক", icon: ShoppingCart },
+    { id: "vendors", label: "বিক্রেতা", icon: Truck },
 
+    // ✅ ADDED
+    { id: "area", label: "এরিয়া", icon: MapPin },
+    { id: "obhijog", label: "অভিযোগ", icon: AlertCircle },
+
+    { id: "products", label: "পণ্য ও সেবা", icon: Package },
+    { id: "meter", label: "মিটার রিডিং", icon: Gauge },
+    { id: "sms", label: "এসএমএস", icon: MessageSquare },
+  ]
 
   return (
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm lg:hidden z-40 animate-in fade-in duration-300" 
-          onClick={() => onOpenChange(false)} 
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm lg:hidden z-40 animate-in fade-in duration-300"
+          onClick={() => onOpenChange(false)}
         />
       )}
 
@@ -73,7 +78,7 @@ const menuItems = [
       >
         {/* Top glow effect */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-300 to-transparent opacity-60"></div>
-        
+
         <div className="p-5">
           {/* Close Button Mobile */}
           <button
@@ -83,40 +88,50 @@ const menuItems = [
           >
             <X size={20} />
           </button>
-          
+
           {/* ✅ Brand Logo Section */}
           <div className="flex py-4 gap-4">
             {/* Brand Logo */}
             <div className="w-12 h-12 bg-gradient-to-br from-white/25 to-cyan-400/30 rounded-xl flex items-center justify-center border border-white/25 shadow-lg">
-              <span className="text-xl font-extrabold tracking-wide bg-gradient-to-r from-white to-cyan-100 bg-clip-text text-transparent">SG</span>
+              <span className="text-xl font-extrabold tracking-wide bg-gradient-to-r from-white to-cyan-100 bg-clip-text text-transparent">
+                SG
+              </span>
             </div>
 
             {/* Brand Text */}
             <div className="min-w-0 flex-1">
-              <h2 className="font-extrabold text-lg leading-tight truncate bg-gradient-to-r from-white to-cyan-100 bg-clip-text text-transparent">Shahid Generator</h2>
+              <h2 className="font-extrabold text-lg leading-tight truncate bg-gradient-to-r from-white to-cyan-100 bg-clip-text text-transparent">
+                Shahid Generator
+              </h2>
               <p className="text-xs text-white/80 truncate">ম্যানেজমেন্ট ড্যাশবোর্ড</p>
             </div>
           </div>
 
           {/* ✅ Profile Section */}
-          <div className="mb-7 rounded-2xl border border-white/20 bg-gradient-to-br from-white/12 to-white/5 backdrop-blur-sm p-4 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="flex items-center gap-3">
-              {/* Profile Photo with glow effect */}
-              <div className="relative">
-                <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-cyan-400 to-blue-500 border-2 border-white/30 shadow-lg">
-                  <img src={profileImg} alt={profileName} className="w-full h-full object-cover" />
-                </div>
-                {/* Online status indicator */}
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-emerald-400 border-2 border-teal-700 shadow-[0_0_10px_rgba(52,211,153,0.8)]"></div>
-              </div>
+          <div className="mb-7 rounded-2xl border border-white/20 bg-gradient-to-br from-white/12 to-white/5 backdrop-blur-sm p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+  <div className="flex items-center gap-3">
+    <div className="relative group">
+      <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-cyan-400 to-blue-500 border-2 border-white/30 shadow-lg">
+        <img 
+          src={profileImg} 
+          alt={profileName} 
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+        />
+      </div>
+      
+      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-emerald-400 border-2 border-teal-700 shadow-[0_0_10px_rgba(52,211,153,0.8)] animate-ping"></div>
+    </div>
 
-              {/* Name + Role */}
-              <div className="min-w-0 flex-1">
-                <h3 className="font-bold text-sm leading-tight truncate">{profileName}</h3>
-                <p className="text-xs text-white/70 truncate">{profileRole}</p>
-              </div>
-            </div>
-          </div>
+    <div className="min-w-0 flex-1">
+      <h3 className="font-bold text-sm leading-tight truncate animate-pulse animate-once animate-duration-1000">
+        {profileName}
+      </h3>
+      <p className="text-xs text-white/70 truncate">
+        {profileRole}
+      </p>
+    </div>
+  </div>
+</div>
 
           {/* Menu */}
           <nav className="space-y-2">
@@ -136,21 +151,23 @@ const menuItems = [
                   }`}
                 >
                   {/* Active glow effect */}
-                  {isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-                  )}
-                  
-                  <div className={`p-2 rounded-lg transition-all duration-300 ${isActive ? 'bg-white/30' : 'bg-white/10 group-hover:bg-white/20'}`}>
+                  {isActive && <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>}
+
+                  <div
+                    className={`p-2 rounded-lg transition-all duration-300 ${
+                      isActive ? "bg-white/30" : "bg-white/10 group-hover:bg-white/20"
+                    }`}
+                  >
                     <Icon size={20} className={`${isActive ? "text-white" : "text-white/80 group-hover:text-white"}`} />
                   </div>
-                  
+
                   <span className="font-medium flex-1 text-left relative z-10">{item.label}</span>
-                  
+
                   <ChevronRight
                     size={18}
                     className={`transition-all duration-300 ${
-                      isActive 
-                        ? "opacity-100 translate-x-0 scale-110 text-cyan-300" 
+                      isActive
+                        ? "opacity-100 translate-x-0 scale-110 text-cyan-300"
                         : "opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 text-white/60"
                     }`}
                   />
@@ -164,24 +181,32 @@ const menuItems = [
                 type="button"
                 onClick={() => setOpenMenu((p) => ({ ...p, site: !p.site }))}
                 className={`w-full flex items-center gap-3 px-4 py-3.5 transition-all duration-300 group ${
-                  openMenu.site 
-                    ? "bg-gradient-to-r from-white/18 to-white/10" 
-                    : "hover:bg-white/12 text-white/90"
+                  openMenu.site ? "bg-gradient-to-r from-white/18 to-white/10" : "hover:bg-white/12 text-white/90"
                 }`}
               >
-                <div className={`p-2 rounded-lg transition-all duration-300 ${openMenu.site ? 'bg-white/25' : 'bg-white/10 group-hover:bg-white/20'}`}>
+                <div
+                  className={`p-2 rounded-lg transition-all duration-300 ${
+                    openMenu.site ? "bg-white/25" : "bg-white/10 group-hover:bg-white/20"
+                  }`}
+                >
                   <Folder size={20} className={openMenu.site ? "text-white" : "text-white/80"} />
                 </div>
-                
+
                 <span className="font-medium flex-1 text-left">সাইট</span>
-                
-                <ChevronRight 
-                  className={`transition-all duration-500 ${openMenu.site ? "rotate-90 scale-110 text-cyan-300" : "text-white/60 group-hover:text-white"}`} 
-                  size={18} 
+
+                <ChevronRight
+                  className={`transition-all duration-500 ${
+                    openMenu.site ? "rotate-90 scale-110 text-cyan-300" : "text-white/60 group-hover:text-white"
+                  }`}
+                  size={18}
                 />
               </button>
 
-              <div className={`transition-all duration-500 overflow-hidden ${openMenu.site ? "max-h-48 opacity-100" : "max-h-0 opacity-0"}`}>
+              <div
+                className={`transition-all duration-500 overflow-hidden ${
+                  openMenu.site ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
                 <div className="px-3 pb-3">
                   <div className="mt-2 space-y-1 pl-5 border-l border-white/20">
                     <button
@@ -193,7 +218,11 @@ const menuItems = [
                           : "hover:bg-white/12 text-white/90"
                       }`}
                     >
-                      <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activePage === "meterReadingSite" ? 'bg-cyan-300 scale-125' : 'bg-white/50'}`}></div>
+                      <div
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          activePage === "meterReadingSite" ? "bg-cyan-300 scale-125" : "bg-white/50"
+                        }`}
+                      ></div>
                       <span className="text-sm">মিটার রিডিং: সাইট</span>
                       {activePage === "meterReadingSite" && (
                         <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></div>
@@ -209,7 +238,11 @@ const menuItems = [
                           : "hover:bg-white/12 text-white/90"
                       }`}
                     >
-                      <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activePage === "billCollectionSite" ? 'bg-cyan-300 scale-125' : 'bg-white/50'}`}></div>
+                      <div
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          activePage === "billCollectionSite" ? "bg-cyan-300 scale-125" : "bg-white/50"
+                        }`}
+                      ></div>
                       <span className="text-sm">বিল কালেকশন: সাইট</span>
                       {activePage === "billCollectionSite" && (
                         <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></div>
@@ -226,24 +259,32 @@ const menuItems = [
                 type="button"
                 onClick={() => setOpenMenu((p) => ({ ...p, sales: !p.sales }))}
                 className={`w-full flex items-center gap-3 px-4 py-3.5 transition-all duration-300 group ${
-                  openMenu.sales 
-                    ? "bg-gradient-to-r from-white/18 to-white/10" 
-                    : "hover:bg-white/12 text-white/90"
+                  openMenu.sales ? "bg-gradient-to-r from-white/18 to-white/10" : "hover:bg-white/12 text-white/90"
                 }`}
               >
-                <div className={`p-2 rounded-lg transition-all duration-300 ${openMenu.sales ? 'bg-white/25' : 'bg-white/10 group-hover:bg-white/20'}`}>
+                <div
+                  className={`p-2 rounded-lg transition-all duration-300 ${
+                    openMenu.sales ? "bg-white/25" : "bg-white/10 group-hover:bg-white/20"
+                  }`}
+                >
                   <TrendingUp size={20} className={openMenu.sales ? "text-white" : "text-white/80"} />
                 </div>
-                
+
                 <span className="font-medium flex-1 text-left">বিক্রয়</span>
-                
-                <ChevronRight 
-                  className={`transition-all duration-500 ${openMenu.sales ? "rotate-90 scale-110 text-emerald-300" : "text-white/60 group-hover:text-white"}`} 
-                  size={18} 
+
+                <ChevronRight
+                  className={`transition-all duration-500 ${
+                    openMenu.sales ? "rotate-90 scale-110 text-emerald-300" : "text-white/60 group-hover:text-white"
+                  }`}
+                  size={18}
                 />
               </button>
 
-              <div className={`transition-all duration-500 overflow-hidden ${openMenu.sales ? "max-h-48 opacity-100" : "max-h-0 opacity-0"}`}>
+              <div
+                className={`transition-all duration-500 overflow-hidden ${
+                  openMenu.sales ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
                 <div className="px-3 pb-3">
                   <div className="mt-2 space-y-1 pl-5 border-l border-white/20">
                     <button
@@ -255,7 +296,11 @@ const menuItems = [
                           : "hover:bg-white/12 text-white/90"
                       }`}
                     >
-                      <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activePage === "chalan" ? 'bg-emerald-300 scale-125' : 'bg-white/50'}`}></div>
+                      <div
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          activePage === "chalan" ? "bg-emerald-300 scale-125" : "bg-white/50"
+                        }`}
+                      ></div>
                       <span className="text-sm">চালান</span>
                       {activePage === "chalan" && (
                         <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></div>
@@ -271,7 +316,11 @@ const menuItems = [
                           : "hover:bg-white/12 text-white/90"
                       }`}
                     >
-                      <div className={`w-2 h-2 rounded-full transition-all duration-300 ${activePage === "chalanPrint" ? 'bg-emerald-300 scale-125' : 'bg-white/50'}`}></div>
+                      <div
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          activePage === "chalanPrint" ? "bg-emerald-300 scale-125" : "bg-white/50"
+                        }`}
+                      ></div>
                       <span className="text-sm">চালান প্রিন্ট</span>
                       {activePage === "chalanPrint" && (
                         <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></div>
@@ -291,16 +340,18 @@ const menuItems = [
                   : "hover:bg-white/12 hover:border-l-4 hover:border-amber-300/50 hover:shadow-md"
               }`}
             >
-              {activePage === "settings" && (
-                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
-              )}
-              
-              <div className={`p-2 rounded-lg transition-all duration-300 ${activePage === "settings" ? 'bg-white/30' : 'bg-white/10 group-hover:bg-white/20'}`}>
+              {activePage === "settings" && <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>}
+
+              <div
+                className={`p-2 rounded-lg transition-all duration-300 ${
+                  activePage === "settings" ? "bg-white/30" : "bg-white/10 group-hover:bg-white/20"
+                }`}
+              >
                 <Settings size={20} className={`${activePage === "settings" ? "text-white" : "text-white/80 group-hover:text-white"}`} />
               </div>
-              
+
               <span className="font-medium flex-1 text-left relative z-10">সেটিংস</span>
-              
+
               <ChevronRight
                 size={18}
                 className={`transition-all duration-300 ${
@@ -315,11 +366,8 @@ const menuItems = [
           {/* Bottom decorative element */}
           <div className="mt-8 pt-4 border-t border-white/15">
             <div className="flex items-center justify-center">
-  <div className="text-xs text-white/50">
-    Shahid Generator © {new Date().getFullYear()}
-  </div>
-</div>
-
+              <div className="text-xs text-white/50">Shahid Generator © {new Date().getFullYear()}</div>
+            </div>
           </div>
         </div>
       </aside>
