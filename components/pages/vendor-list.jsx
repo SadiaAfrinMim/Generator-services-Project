@@ -1,9 +1,18 @@
 import { useMemo, useState } from "react"
-import { Search, Eye, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import {
+  Search,
+  Eye,
+  Pencil,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Printer,
+  Download,
+} from "lucide-react"
 import Modal from "../inputField/Modal"
-import CustomerDetailsForm from "../inputField/CustomerDetailsForm"
 
-const vendorData = [
+const vendorSeed = [
   { id: 1, name: "টেক আইটি বি ডি লিমিটেড", phone: "01717055765", email: "abir@tech365.com", status: "Active" },
   { id: 2, name: "রহিম ট্রেডার্স", phone: "01812000000", email: "rahim@traders.com", status: "Active" },
   { id: 3, name: "সালমান এন্টারপ্রাইজ", phone: "01933000000", email: "salman@enterprise.com", status: "Inactive" },
@@ -12,6 +21,7 @@ const vendorData = [
 function PageBtn({ active, children, onClick, disabled }) {
   return (
     <button
+      type="button"
       disabled={disabled}
       onClick={onClick}
       className={[
@@ -41,31 +51,238 @@ function StatusPill({ status }) {
   )
 }
 
+function InfoRow({ label, value }) {
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3">
+      <div className="text-sm font-extrabold text-slate-900">{label}</div>
+      <div className="text-sm font-semibold text-slate-700 text-right">{value ?? "—"}</div>
+    </div>
+  )
+}
+
+function VendorView({ row }) {
+  if (!row) return null
+  return (
+    <div className="space-y-3 text-black">
+      <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-4">
+        <div className="text-lg font-extrabold text-slate-900">{row.name}</div>
+        <div className="mt-1 text-sm font-semibold text-slate-600">{row.email}</div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <InfoRow label="বিক্রেতার নাম" value={row.name} />
+        <InfoRow label="ফোন" value={row.phone} />
+        <InfoRow label="ইমেইল" value={row.email} />
+        <InfoRow label="স্ট্যাটাস" value={row.status} />
+      </div>
+    </div>
+  )
+}
+
+function VendorForm({ initial, onClose, onSave, mode = "add" }) {
+  const [form, setForm] = useState(
+    initial ?? { name: "", phone: "", email: "", status: "Active" }
+  )
+
+  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }))
+
+  const submit = (e) => {
+    e.preventDefault()
+    if (!form.name.trim() || !form.phone.trim()) {
+      alert("নাম এবং ফোন অবশ্যই দিতে হবে।")
+      return
+    }
+    onSave(form)
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-4 text-black">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="md:col-span-2">
+          <label className="block text-sm font-extrabold text-slate-900 mb-1">বিক্রেতার নাম *</label>
+          <input
+            value={form.name}
+            onChange={(e) => set("name", e.target.value)}
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-200"
+            placeholder="যেমন: রহমান ট্রেডার্স"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-extrabold text-slate-900 mb-1">ফোন *</label>
+          <input
+            value={form.phone}
+            onChange={(e) => set("phone", e.target.value)}
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-200"
+            placeholder="01XXXXXXXXX"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-extrabold text-slate-900 mb-1">ইমেইল</label>
+          <input
+            value={form.email}
+            onChange={(e) => set("email", e.target.value)}
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-200"
+            placeholder="example@mail.com"
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-sm font-extrabold text-slate-900 mb-1">স্ট্যাটাস</label>
+          <select
+            value={form.status}
+            onChange={(e) => set("status", e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-200"
+          >
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 hover:bg-slate-50"
+        >
+          বাতিল
+        </button>
+
+        <button
+          type="submit"
+          className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-5 py-3 text-sm font-extrabold text-white hover:opacity-90"
+        >
+          {mode === "add" ? "Add Vendor" : "Update Vendor"}
+        </button>
+      </div>
+    </form>
+  )
+}
+
+function DeleteConfirm({ row, onClose, onConfirm }) {
+  if (!row) return null
+  return (
+    <div className="space-y-4 text-black">
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+        <div className="text-base font-extrabold text-red-700">ডিলিট কনফার্ম</div>
+        <div className="mt-1 text-sm font-semibold text-red-700/80">
+          <span className="font-extrabold">{row.name}</span> কে ডিলিট করলে আর ফেরত আনা যাবে না।
+        </div>
+      </div>
+
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 hover:bg-slate-50"
+        >
+          বাতিল
+        </button>
+        <button
+          type="button"
+          onClick={onConfirm}
+          className="rounded-xl bg-red-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-red-700"
+        >
+          ডিলিট করুন
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function PrintView({ row, onPrint }) {
+  if (!row) return null
+  return (
+    <div className="space-y-4 text-black">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="text-sm font-extrabold text-slate-900">প্রিন্ট প্রিভিউ</div>
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <InfoRow label="বিক্রেতা" value={row.name} />
+          <InfoRow label="ফোন" value={row.phone} />
+          <InfoRow label="ইমেইল" value={row.email} />
+          <InfoRow label="স্ট্যাটাস" value={row.status} />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={onPrint}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-extrabold text-white hover:bg-black"
+      >
+        <Printer className="h-5 w-5" />
+        Print (window.print)
+      </button>
+    </div>
+  )
+}
+
+function DownloadView({ row, onDownload }) {
+  if (!row) return null
+  return (
+    <div className="space-y-4 text-black">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="text-sm font-extrabold text-slate-900">ডাউনলোড</div>
+        <div className="mt-2 text-sm font-semibold text-slate-600">
+          CSV ফাইল ডাউনলোড হবে:{" "}
+          <span className="font-extrabold text-slate-900">vendor-{row.id}.csv</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={onDownload}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-5 py-3 text-sm font-extrabold text-white hover:opacity-90"
+      >
+        <Download className="h-5 w-5" />
+        Download CSV
+      </button>
+    </div>
+  )
+}
+
 export default function VendorList() {
+  // ✅ stateful rows (Add/Edit/Delete reflect হবে)
+  const [data, setData] = useState(vendorSeed)
+
   const [pageSize, setPageSize] = useState(10)
   const [query, setQuery] = useState("")
   const [searchType, setSearchType] = useState("All")
   const [page, setPage] = useState(1)
 
-  // ✅ Modal state এখানে থাকবে
+  // ✅ active row + modals
+  const [activeRow, setActiveRow] = useState(null)
+  const [addOpen, setAddOpen] = useState(false)
+  const [viewOpen, setViewOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-  const [editingRow, setEditingRow] = useState(null)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [printOpen, setPrintOpen] = useState(false)
+  const [downloadOpen, setDownloadOpen] = useState(false)
 
-  const openEdit = (row) => {
-    setEditingRow(row)
-    setEditOpen(true)
-  }
-
-  const closeEdit = () => {
+  const closeAll = () => {
+    setAddOpen(false)
+    setViewOpen(false)
     setEditOpen(false)
-    setEditingRow(null)
+    setDeleteOpen(false)
+    setPrintOpen(false)
+    setDownloadOpen(false)
+    setActiveRow(null)
   }
+
+  const openWithRow = (row, setter) => {
+    setActiveRow(row)
+    setter(true)
+  }
+
+  // ✅ Add form initial
+  const [addFormInit, setAddFormInit] = useState({ name: "", phone: "", email: "", status: "Active" })
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return vendorData
+    if (!q) return data
 
-    return vendorData.filter((v) => {
+    return data.filter((v) => {
       const name = (v.name || "").toLowerCase()
       const phone = (v.phone || "").toLowerCase()
       const email = (v.email || "").toLowerCase()
@@ -76,7 +293,7 @@ export default function VendorList() {
 
       return `${name} ${phone} ${email}`.includes(q)
     })
-  }, [query, searchType])
+  }, [data, query, searchType])
 
   const total = filtered.length
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
@@ -104,21 +321,77 @@ export default function VendorList() {
 
   const reset = () => setPage(1)
 
+  // ✅ ADD
+  const submitAdd = (payload) => {
+    const nextId = (data?.[0]?.id ?? 0) + 1
+    setData((prev) => [{ id: nextId, ...payload }, ...prev])
+
+    setAddFormInit({ name: "", phone: "", email: "", status: "Active" })
+    closeAll()
+  }
+
+  // ✅ EDIT
+  const submitEdit = (payload) => {
+    if (!activeRow) return
+    setData((prev) => prev.map((r) => (r.id === activeRow.id ? { ...r, ...payload } : r)))
+    closeAll()
+  }
+
+  // ✅ DELETE
+  const confirmDelete = () => {
+    if (!activeRow) return
+    setData((prev) => prev.filter((r) => r.id !== activeRow.id))
+    closeAll()
+  }
+
+  // ✅ PRINT
+  const handlePrint = () => window.print()
+
+  // ✅ DOWNLOAD CSV
+  const handleDownload = () => {
+    if (!activeRow) return
+    const headers = ["id", "name", "phone", "email", "status"]
+    const values = headers.map((k) => activeRow?.[k] ?? "")
+    const csv =
+      `${headers.join(",")}\n` +
+      `${values.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")}\n`
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `vendor-${activeRow.id}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-6xl px-4 py-6 space-y-4">
-        <div className="flex items-start justify-between">
-          <h1 className="text-2xl font-extrabold text-slate-900">বিক্রেতার তালিকা</h1>
-
-          <div className="text-sm text-slate-500">
-            <span className="text-blue-600 hover:underline cursor-pointer">ড্যাশবোর্ড</span>
-            <span className="mx-2">/</span>
-            <span className="text-blue-600 hover:underline cursor-pointer">বিক্রেতার তালিকা</span>
-            <span className="mx-2">/</span>
-            <span className="text-slate-500">অ্যাড নিউ</span>
+        {/* Header */}
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h1 className="text-2xl font-extrabold text-slate-900">বিক্রেতার তালিকা</h1>
+            <div className="text-sm text-slate-500 mt-1">
+              <span className="text-blue-600 hover:underline cursor-pointer">ড্যাশবোর্ড</span>
+              <span className="mx-2">/</span>
+              <span className="text-blue-600 hover:underline cursor-pointer">বিক্রেতার তালিকা</span>
+              <span className="mx-2">/</span>
+              <span className="text-slate-500">অ্যাড নিউ</span>
+            </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-5 py-3 text-sm font-extrabold text-white hover:opacity-90 transition"
+          >
+            <Plus className="h-5 w-5" />
+            নতুন বিক্রেতা যোগ করুন
+          </button>
         </div>
 
+        {/* Filters */}
         <div className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur shadow-sm">
           <div className="p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-2">
@@ -165,6 +438,7 @@ export default function VendorList() {
               </select>
 
               <button
+                type="button"
                 onClick={reset}
                 className="h-10 w-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition grid place-items-center"
                 title="Search"
@@ -181,6 +455,7 @@ export default function VendorList() {
           </div>
         </div>
 
+        {/* Table */}
         <div className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-[900px] w-full">
@@ -223,21 +498,49 @@ export default function VendorList() {
 
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-center gap-3">
-                          <button className="text-blue-600 hover:text-blue-700" title="View">
+                          <button
+                            type="button"
+                            className="text-blue-600 hover:text-blue-700"
+                            title="View"
+                            onClick={() => openWithRow(v, setViewOpen)}
+                          >
                             <Eye className="h-5 w-5" />
                           </button>
 
-                          {/* ✅ এখানে v পাঠালাম */}
                           <button
+                            type="button"
                             className="text-blue-600 hover:text-blue-700"
                             title="Edit"
-                            onClick={() => openEdit(v)}
+                            onClick={() => openWithRow(v, setEditOpen)}
                           >
                             <Pencil className="h-5 w-5" />
                           </button>
 
-                          <button className="text-blue-600 hover:text-blue-700" title="Delete">
+                          <button
+                            type="button"
+                            className="text-blue-600 hover:text-blue-700"
+                            title="Delete"
+                            onClick={() => openWithRow(v, setDeleteOpen)}
+                          >
                             <Trash2 className="h-5 w-5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            className="text-blue-600 hover:text-blue-700"
+                            title="Print"
+                            onClick={() => openWithRow(v, setPrintOpen)}
+                          >
+                            <Printer className="h-5 w-5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            className="text-blue-600 hover:text-blue-700"
+                            title="Download"
+                            onClick={() => openWithRow(v, setDownloadOpen)}
+                          >
+                            <Download className="h-5 w-5" />
                           </button>
                         </div>
                       </td>
@@ -248,6 +551,7 @@ export default function VendorList() {
             </table>
           </div>
 
+          {/* Pagination */}
           <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between border-t border-slate-200">
             <div className="text-sm text-slate-600">
               Page <span className="font-bold text-slate-900">{currentPage}</span> /{" "}
@@ -271,16 +575,56 @@ export default function VendorList() {
                 ),
               )}
 
-              <PageBtn onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+              <PageBtn
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
                 <ChevronRight className="h-4 w-4" />
               </PageBtn>
             </div>
           </div>
         </div>
 
-        {/* ✅ Modal (return এর ভিতরে) */}
-        <Modal open={editOpen} onClose={closeEdit} title="বিক্রেতার বিস্তারিত (Edit)">
-          <CustomerDetailsForm initialData={editingRow} onClose={closeEdit} />
+        {/* ===================== MODALS ===================== */}
+
+        {/* ADD NEW */}
+        <Modal open={addOpen} onClose={closeAll} title="নতুন বিক্রেতা যোগ করুন" size="lg">
+          <VendorForm
+            initial={addFormInit}
+            onClose={closeAll}
+            onSave={(payload) => submitAdd(payload)}
+            mode="add"
+          />
+        </Modal>
+
+        {/* VIEW */}
+        <Modal open={viewOpen} onClose={closeAll} title="বিক্রেতার বিস্তারিত" size="lg">
+          <VendorView row={activeRow} />
+        </Modal>
+
+        {/* EDIT */}
+        <Modal open={editOpen} onClose={closeAll} title="বিক্রেতার বিস্তারিত (Edit)" size="lg">
+          <VendorForm
+            initial={activeRow}
+            onClose={closeAll}
+            onSave={(payload) => submitEdit(payload)}
+            mode="edit"
+          />
+        </Modal>
+
+        {/* DELETE */}
+        <Modal open={deleteOpen} onClose={closeAll} title="ডিলিট" size="md">
+          <DeleteConfirm row={activeRow} onClose={closeAll} onConfirm={confirmDelete} />
+        </Modal>
+
+        {/* PRINT */}
+        <Modal open={printOpen} onClose={closeAll} title="প্রিন্ট" size="lg">
+          <PrintView row={activeRow} onPrint={handlePrint} />
+        </Modal>
+
+        {/* DOWNLOAD */}
+        <Modal open={downloadOpen} onClose={closeAll} title="ডাউনলোড" size="lg">
+          <DownloadView row={activeRow} onDownload={handleDownload} />
         </Modal>
       </div>
     </div>

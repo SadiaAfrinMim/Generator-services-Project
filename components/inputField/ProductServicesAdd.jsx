@@ -54,7 +54,7 @@ export default function ProductServicesAdd({ onSave }) {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-[1200px] px-4 py-4">
+      <div className="mx-auto  px-4 py-4">
         {/* Header row */}
         <div className="flex items-start justify-between gap-3">
           <h1 className="text-lg font-bold text-slate-900">হালনাগাদ পণ্য এবং সেবা</h1>

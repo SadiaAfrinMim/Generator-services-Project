@@ -1,9 +1,20 @@
 import { useMemo, useState } from "react"
-import { Search, Eye, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import {
+  Search,
+  Eye,
+  Pencil,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Printer,
+  Download,
+} from "lucide-react"
 import Modal from "../inputField/Modal"
 import ProductServicesAdd from "../inputField/ProductServicesAdd"
+import ViewModalBody from "../inputField/ViewModalBody"
 
-const demoData = [
+const seedData = [
   {
     id: 1,
     name: "১০ টাকা এক ইউন্ডিট",
@@ -45,7 +56,6 @@ const demoData = [
   },
 ]
 
-// চাইলে এগুলোও পুরো বাংলা করে দিতে পারি, তবে তোমার ডেটার সাথে মিল রাখতে ইংরেজি রেখেছি
 const PRODUCT_TYPES = ["All", "Product", "Service"]
 const CATEGORIES = ["All", "Repair", "Parts", "Accessories"]
 const STATUSES = ["All", "Active", "Inactive"]
@@ -53,11 +63,14 @@ const STATUSES = ["All", "Active", "Inactive"]
 function PageBtn({ active, children, onClick, disabled }) {
   return (
     <button
+      type="button"
       disabled={disabled}
       onClick={onClick}
       className={[
-        "h-9 min-w-9 rounded border px-2 text-sm font-semibold transition",
-        active ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50",
+        "h-9 min-w-9 rounded-lg border px-2 text-sm font-semibold transition",
+        active
+          ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-transparent shadow-sm"
+          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50",
         disabled ? "opacity-50 cursor-not-allowed" : "",
       ].join(" ")}
     >
@@ -66,7 +79,122 @@ function PageBtn({ active, children, onClick, disabled }) {
   )
 }
 
+function InfoRow({ label, value }) {
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3">
+      <div className="text-sm font-extrabold text-slate-900">{label}</div>
+      <div className="text-sm font-semibold text-slate-700 text-right break-words">
+        {value ?? "—"}
+      </div>
+    </div>
+  )
+}
+
+function StatusPill({ status }) {
+  const active = status === "Active"
+  return (
+    <span
+      className={[
+        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ring-1",
+        active
+          ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+          : "bg-rose-50 text-rose-700 ring-rose-200",
+      ].join(" ")}
+    >
+      {status}
+    </span>
+  )
+}
+
+function DeleteConfirm({ row, onClose, onConfirm }) {
+  if (!row) return null
+  return (
+    <div className="space-y-4 p-6 text-black">
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+        <div className="text-base font-extrabold text-red-700">ডিলিট কনফার্ম</div>
+        <div className="mt-1 text-sm font-semibold text-red-700/80">
+          <span className="font-extrabold">{row.name}</span> ডিলিট করলে আর ফেরত
+          আনা যাবে না।
+        </div>
+      </div>
+
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 hover:bg-slate-50"
+        >
+          বাতিল
+        </button>
+        <button
+          type="button"
+          onClick={onConfirm}
+          className="rounded-xl bg-red-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-red-700"
+        >
+          ডিলিট করুন
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function PrintBody({ row, onPrint }) {
+  if (!row) return null
+  return (
+    <div className="space-y-4 p-6 text-black">
+      <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="text-base font-extrabold text-slate-900">{row.name}</div>
+        <div className="mt-1 text-sm text-slate-700">কোড: {row.code || "-"}</div>
+        <div className="text-sm text-slate-700">মডেল: {row.model || "-"}</div>
+        <div className="text-sm text-slate-700">ব্র্যান্ড: {row.brand || "-"}</div>
+        <div className="text-sm text-slate-700">
+          মূল্য: {Number(row.salesPrice || 0).toFixed(2)}
+        </div>
+        <div className="mt-2">
+          <StatusPill status={row.status} />
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onPrint}
+          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-blue-700"
+        >
+          <Printer className="h-5 w-5" />
+          প্রিন্ট করুন
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function DownloadBody({ row, onDownload }) {
+  if (!row) return null
+  return (
+    <div className="space-y-4 p-6 text-black">
+      <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="text-base font-extrabold text-slate-900">{row.name}</div>
+        <div className="mt-1 text-sm text-slate-700">CSV ফাইল হিসেবে ডাউনলোড হবে</div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onDownload}
+          className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-emerald-700"
+        >
+          <Download className="h-5 w-5" />
+          ডাউনলোড করুন
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function ProductServices() {
+  const [data, setData] = useState(seedData)
+
   // filters
   const [productType, setProductType] = useState("All")
   const [code, setCode] = useState("")
@@ -78,24 +206,32 @@ export default function ProductServices() {
   const [status, setStatus] = useState("All")
   const [pageSize, setPageSize] = useState(50)
   const [page, setPage] = useState(1)
- 
+
+  // modals
+  const [activeRow, setActiveRow] = useState(null)
+  const [addOpen, setAddOpen] = useState(false)
+  const [viewOpen, setViewOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-  const [editingRow, setEditingRow] = useState(null)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [printOpen, setPrintOpen] = useState(false)
+  const [downloadOpen, setDownloadOpen] = useState(false)
 
-  
-
-
-
-  const openEdit = (row) => {
-    setEditingRow(row)
-    setEditOpen(true)
-  }
-
-  const closeEdit = () => {
+  const closeAll = () => {
+    setAddOpen(false)
+    setViewOpen(false)
     setEditOpen(false)
-    setEditingRow(null)
+    setDeleteOpen(false)
+    setPrintOpen(false)
+    setDownloadOpen(false)
+    setActiveRow(null)
   }
 
+  const openWithRow = (row, setter) => {
+    setActiveRow(row)
+    setter(true)
+  }
+
+  const reset = () => setPage(1)
 
   const filtered = useMemo(() => {
     const c = code.trim().toLowerCase()
@@ -104,7 +240,7 @@ export default function ProductServices() {
     const md = model.trim().toLowerCase()
     const br = brandName.trim().toLowerCase()
 
-    return demoData.filter((p) => {
+    return data.filter((p) => {
       const okType = productType === "All" || p.productType === productType
       const okCategory = category === "All" || p.category === category
       const okStatus = status === "All" || p.status === status
@@ -117,7 +253,7 @@ export default function ProductServices() {
 
       return okType && okCategory && okStatus && okCode && okName && okBarcode && okModel && okBrand
     })
-  }, [productType, category, status, code, productName, barcode, model, brandName])
+  }, [data, productType, category, status, code, productName, barcode, model, brandName])
 
   const total = filtered.length
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
@@ -143,28 +279,68 @@ export default function ProductServices() {
     return out
   }, [currentPage, totalPages])
 
-  const reset = () => setPage(1)
+  // ADD
+  const handleAddSave = (payload) => {
+    const nextId = Math.max(0, ...data.map((d) => d.id)) + 1
+    setData((prev) => [{ id: nextId, ...payload }, ...prev])
+    closeAll()
+  }
+
+  // EDIT
+  const handleEditSave = (payload) => {
+    if (!activeRow) return
+    setData((prev) => prev.map((x) => (x.id === activeRow.id ? { ...x, ...payload } : x)))
+    closeAll()
+  }
+
+  // DELETE
+  const confirmDelete = () => {
+    if (!activeRow) return
+    setData((prev) => prev.filter((x) => x.id !== activeRow.id))
+    closeAll()
+  }
+
+  // PRINT
+  const handlePrint = () => window.print()
+
+  // DOWNLOAD CSV
+  const handleDownload = () => {
+    if (!activeRow) return
+    const headers = ["id", "name", "model", "code", "brand", "productType", "category", "barcode", "salesPrice", "status"]
+    const values = headers.map((k) => activeRow?.[k] ?? "")
+    const csv =
+      `${headers.join(",")}\n` +
+      `${values.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")}\n`
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `product-${activeRow.id}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-5 space-y-4">
-        {/* শিরোনাম + ব্রেডক্রাম্ব */}
-        <div className="flex items-start justify-between">
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900">পণ্য ও সেবার তালিকা</h1>
 
-          <div className="text-sm text-slate-500">
-            <span className="text-blue-600 hover:underline cursor-pointer">ড্যাশবোর্ড</span>
-            <span className="mx-2">/</span>
-            <span className="text-blue-600 hover:underline cursor-pointer">পণ্য ও সেবার তালিকা</span>
-            <span className="mx-2">/</span>
-            <span className="text-blue-600 hover:underline cursor-pointer">নতুন যোগ করুন</span>
-          </div>
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2.5 text-sm font-extrabold text-white hover:opacity-90"
+          >
+            <Plus className="h-5 w-5" />
+            নতুন যোগ করুন
+          </button>
         </div>
 
-        {/* ফিল্টার কার্ড */}
+        {/* Filters */}
         <div className="rounded border border-slate-200 bg-white shadow-sm">
           <div className="p-4 space-y-3">
-            {/* Row 1 */}
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
               <div className="lg:col-span-2">
                 <label className="text-sm font-semibold text-slate-700">পণ্যের ধরন</label>
@@ -239,7 +415,6 @@ export default function ProductServices() {
               </div>
             </div>
 
-            {/* Row 2 */}
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:items-end">
               <div className="lg:col-span-2">
                 <label className="text-sm font-semibold text-slate-700">মডেল</label>
@@ -303,6 +478,7 @@ export default function ProductServices() {
 
               <div className="lg:col-span-2 flex lg:justify-start">
                 <button
+                  type="button"
                   onClick={reset}
                   className="mt-2 lg:mt-0 inline-flex h-10 w-10 items-center justify-center rounded border border-slate-200 bg-white hover:bg-slate-50 transition"
                   title="সার্চ"
@@ -314,10 +490,11 @@ export default function ProductServices() {
           </div>
         </div>
 
-        {/* টেবিল কার্ড */}
+        {/* Table */}
         <div className="rounded border border-slate-200 bg-white shadow-sm overflow-hidden">
           <div className="p-4 text-sm text-slate-700">
-            দেখাচ্ছে <span className="font-semibold">{from}</span> - <span className="font-semibold">{to}</span> /{" "}
+            দেখাচ্ছে <span className="font-semibold">{from}</span> -{" "}
+            <span className="font-semibold">{to}</span> /{" "}
             <span className="font-semibold">{total}</span>
           </div>
 
@@ -331,7 +508,9 @@ export default function ProductServices() {
                   <th className="px-4 py-3 text-sm font-bold text-slate-800">বারকোড</th>
                   <th className="px-4 py-3 text-sm font-bold text-slate-800">বিক্রয় মূল্য</th>
                   <th className="px-4 py-3 text-sm font-bold text-slate-800">স্ট্যাটাস</th>
-                  <th className="px-4 py-3 text-sm font-bold text-slate-800 text-center">অ্যাকশন</th>
+                  <th className="px-4 py-3 text-sm font-bold text-slate-800 text-center">
+                    অ্যাকশন
+                  </th>
                 </tr>
               </thead>
 
@@ -344,12 +523,19 @@ export default function ProductServices() {
                   </tr>
                 ) : (
                   rows.map((p) => (
-                    <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                    <tr
+                      key={p.id}
+                      className="border-b border-slate-100 hover:bg-slate-50 transition"
+                    >
                       <td className="px-4 py-4 align-top">
                         <div className="flex items-start gap-3">
                           <div className="h-9 w-9 rounded bg-slate-100 border border-slate-200 grid place-items-center overflow-hidden">
                             {p.imageUrl ? (
-                              <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
+                              <img
+                                src={p.imageUrl}
+                                alt={p.name}
+                                className="h-full w-full object-cover"
+                              />
                             ) : (
                               <span className="text-xs text-slate-400">ছবি</span>
                             )}
@@ -377,23 +563,55 @@ export default function ProductServices() {
                       <td className="px-4 py-4 align-top text-slate-700">
                         {Number(p.salesPrice || 0).toFixed(2)}
                       </td>
-                      <td className="px-4 py-4 align-top text-slate-700">{p.status}</td>
+                      <td className="px-4 py-4 align-top">
+                        <StatusPill status={p.status} />
+                      </td>
 
                       <td className="px-4 py-4 align-top">
-                        <div className="flex items-center justify-center gap-3 text-blue-600">
-                          <button title="দেখুন" className="hover:text-blue-700">
+                        <div className="flex items-center justify-center gap-3 text-blue-600 flex-wrap">
+                          <button
+                            type="button"
+                            title="দেখুন"
+                            className="hover:text-blue-700"
+                            onClick={() => openWithRow(p, setViewOpen)}
+                          >
                             <Eye className="h-5 w-5" />
                           </button>
-                         <button
-  className="text-blue-600 hover:text-blue-700"
-  title="Edit"
-  onClick={() => openEdit(p)}   // এখানে p = row/item
->
-  <Pencil className="h-5 w-5" />
-</button>
 
-                          <button title="ডিলিট" className="hover:text-blue-700">
+                          <button
+                            type="button"
+                            className="hover:text-blue-700"
+                            title="Edit"
+                            onClick={() => openWithRow(p, setEditOpen)}
+                          >
+                            <Pencil className="h-5 w-5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            title="ডিলিট"
+                            className="hover:text-blue-700"
+                            onClick={() => openWithRow(p, setDeleteOpen)}
+                          >
                             <Trash2 className="h-5 w-5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            title="Print"
+                            className="hover:text-blue-700"
+                            onClick={() => openWithRow(p, setPrintOpen)}
+                          >
+                            <Printer className="h-5 w-5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            title="Download"
+                            className="hover:text-blue-700"
+                            onClick={() => openWithRow(p, setDownloadOpen)}
+                          >
+                            <Download className="h-5 w-5" />
                           </button>
                         </div>
                       </td>
@@ -407,12 +625,15 @@ export default function ProductServices() {
           {/* Pagination */}
           <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between border-t border-slate-200">
             <div className="text-sm text-slate-600">
-              পেজ <span className="font-semibold text-slate-900">{currentPage}</span> /{" "}
-              <span className="font-semibold text-slate-900">{totalPages}</span>
+              পেজ <span className="font-semibold text-slate-900">{currentPage}</span>{" "}
+              / <span className="font-semibold text-slate-900">{totalPages}</span>
             </div>
 
             <div className="flex items-center gap-1 flex-wrap">
-              <PageBtn onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+              <PageBtn
+                onClick={() => setPage((x) => Math.max(1, x - 1))}
+                disabled={currentPage === 1}
+              >
                 <ChevronLeft className="h-4 w-4" />
               </PageBtn>
 
@@ -425,11 +646,11 @@ export default function ProductServices() {
                   <PageBtn key={p} active={p === currentPage} onClick={() => setPage(p)}>
                     {p}
                   </PageBtn>
-                )
+                ),
               )}
 
               <PageBtn
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => setPage((x) => Math.min(totalPages, x + 1))}
                 disabled={currentPage === totalPages}
               >
                 <ChevronRight className="h-4 w-4" />
@@ -437,8 +658,37 @@ export default function ProductServices() {
             </div>
           </div>
         </div>
-        <Modal open={editOpen} onClose={closeEdit} title="গ্রাহকের বিস্তারিত (Edit)">
-          <ProductServicesAdd initialData={editingRow} onClose={closeEdit} />
+
+        {/* ===================== MODALS ===================== */}
+
+        {/* ADD NEW */}
+        <Modal open={addOpen} onClose={closeAll} title="নতুন পণ্য/সেবা যোগ করুন">
+          <ProductServicesAdd initialData={null} onClose={closeAll} onSave={handleAddSave} />
+        </Modal>
+
+        {/* VIEW (✅ props fixed) */}
+        <Modal open={viewOpen} onClose={closeAll} title="পণ্যের বিস্তারিত">
+          <ViewModalBody row={activeRow} StatusPill={StatusPill} InfoRow={InfoRow} />
+        </Modal>
+
+        {/* EDIT */}
+        <Modal open={editOpen} onClose={closeAll} title="পণ্য/সেবা এডিট করুন">
+          <ProductServicesAdd initialData={activeRow} onClose={closeAll} onSave={handleEditSave} />
+        </Modal>
+
+        {/* DELETE */}
+        <Modal open={deleteOpen} onClose={closeAll} title="ডিলিট">
+          <DeleteConfirm row={activeRow} onClose={closeAll} onConfirm={confirmDelete} />
+        </Modal>
+
+        {/* PRINT */}
+        <Modal open={printOpen} onClose={closeAll} title="প্রিন্ট">
+          <PrintBody row={activeRow} onPrint={handlePrint} />
+        </Modal>
+
+        {/* DOWNLOAD */}
+        <Modal open={downloadOpen} onClose={closeAll} title="ডাউনলোড">
+          <DownloadBody row={activeRow} onDownload={handleDownload} />
         </Modal>
       </div>
     </div>
